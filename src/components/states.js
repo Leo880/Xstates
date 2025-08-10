@@ -45,9 +45,10 @@ const LocationSelector = () => {
       }
 
       const text = await response.text();
-      let data = [];
+      const data = text ? JSON.parse(text) : [];
+        setCountries(Array.isArray(data) ? data : []);
 
-      if (text) {
+      /*if (text) {
         try {
           data = JSON.parse(text);
         } catch (parseError) {
@@ -56,7 +57,8 @@ const LocationSelector = () => {
         }
       }
 
-      setCountries(data);
+      setCountries(data);*/
+
 
     } catch (error) {
       console.error("Error fetching countries:", error);
@@ -77,17 +79,19 @@ const LocationSelector = () => {
         return;
       }
       const text = await response.text();
-    let data = [];
+      const data = text ? JSON.parse(text) : [];
 
-    if (text) {
+    /*if (text) {
       try {
         data = JSON.parse(text);
       } catch (parseError) {
         console.error("Invalid JSON from state API:", parseError);
       }
-    }
+    }*/
 
-    setStates(data);
+    //setStates(data);
+
+    setStates(Array.isArray(data) ? data : []);
 
   } catch (error) {
     console.error("Error fetching states:", error);
@@ -104,17 +108,18 @@ const LocationSelector = () => {
         return;
       }
        const text = await response.text();
-    let data = [];
+       const data = text ? JSON.parse(text) : [];
 
-    if (text) {
+    /*if (text) {
       try {
         data = JSON.parse(text);
       } catch (parseError) {
         console.error("Invalid JSON from city API:", parseError);
       }
     }
-
-    setCities(data);
+      
+    setCities(data); */
+       setCities(Array.isArray(data) ? data : []);
 
   } catch (error) {
     console.error("Error fetching cities:", error);
@@ -123,12 +128,17 @@ const LocationSelector = () => {
 };
 
   const handleCountryChange = (e) => {
-    const country = e.target.value;
-    setSelectedCountry(country);
-    setStates([]); // Reset states when country changes
-    setCities([]); // Reset cities as well
-    fetchStates(country);
-  };
+  const country = e.target.value;
+  setSelectedCountry(country);
+  setStates([]);
+  setCities([]);
+
+  // Don't fetch states if no valid country is selected
+  if (!country) return;
+
+  fetchStates(country);
+};
+
 
   const handleStateChange = (e) => {
     const state = e.target.value;
