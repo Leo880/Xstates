@@ -1,43 +1,72 @@
+
 import React, { useState, useEffect } from 'react';
 
 const LocationSelector = () => {
-  const [countries, setCountries] = useState([]);
-  const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
+  const [countries, setCountries] = useState([]); // State for countries (fetch this according to your needs)
+  const [states, setStates] = useState([]); // State for states
+  const [cities, setCities] = useState([]); // State for cities
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedState, setSelectedState] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
 
-  // helper to safely parse JSON
-  const safeParse = async (response) => {
-    const text = await response.text();
-    if (!text) return [];
-    try {
-      return JSON.parse(text);
-    } catch (err) {
-      console.error("Invalid JSON:", err);
-      return [];
-    }
-  };
-
-  useEffect(() => {
+   /*useEffect(() => {
     const fetchCountries = async () => {
       try {
         const response = await fetch('https://crio-location-selector.onrender.com/countries');
+
         if (!response.ok) {
           console.error("Country API failed:", response.status, response.statusText);
-          setCountries([]);
+          setCountries([]); // fallback empty list
           return;
         }
-        const data = await safeParse(response);
+
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : [];
         setCountries(data);
+
       } catch (error) {
         console.error("Error fetching countries:", error);
-        setCountries([]);
+        setCountries([]); // fallback on error
       }
     };
+
     fetchCountries();
-  }, []);
+  }, []);*/
+
+  useEffect(() => {
+  const fetchCountries = async () => {
+    try {
+      const response = await fetch('https://crio-location-selector.onrender.com/countries');
+
+      if (!response.ok) {
+        console.error("Country API failed:", response.status, response.statusText);
+        setCountries([]); // fallback empty list
+        return;
+      }
+
+      const text = await response.text();
+      let data = [];
+
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch (parseError) {
+          console.error("Invalid JSON from country API:", parseError);
+          data = [];
+        }
+      }
+
+      setCountries(data);
+
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+      setCountries([]); // fallback on error
+    }
+  };
+
+  fetchCountries();
+}, []);
+
 
   const fetchStates = async (country) => {
     try {
@@ -47,13 +76,24 @@ const LocationSelector = () => {
         setStates([]);
         return;
       }
-      const data = await safeParse(response);
-      setStates(data);
-    } catch (error) {
-      console.error("Error fetching states:", error);
-      setStates([]);
+      const text = await response.text();
+    let data = [];
+
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        console.error("Invalid JSON from state API:", parseError);
+      }
     }
-  };
+
+    setStates(data);
+
+  } catch (error) {
+    console.error("Error fetching states:", error);
+    setStates([]);
+  }
+};
 
   const fetchCities = async (country, state) => {
     try {
@@ -63,34 +103,44 @@ const LocationSelector = () => {
         setCities([]);
         return;
       }
-      const data = await safeParse(response);
-      setCities(data);
-    } catch (error) {
-      console.error("Error fetching cities:", error);
-      setCities([]);
+       const text = await response.text();
+    let data = [];
+
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        console.error("Invalid JSON from city API:", parseError);
+      }
     }
-  };
+
+    setCities(data);
+
+  } catch (error) {
+    console.error("Error fetching cities:", error);
+    setCities([]);
+  }
+};
 
   const handleCountryChange = (e) => {
     const country = e.target.value;
     setSelectedCountry(country);
-    setStates([]);
-    setCities([]);
-    if (country) fetchStates(country);
+    setStates([]); // Reset states when country changes
+    setCities([]); // Reset cities as well
+    fetchStates(country);
   };
 
   const handleStateChange = (e) => {
     const state = e.target.value;
     setSelectedState(state);
-    setCities([]);
-    if (state) fetchCities(selectedCountry, state);
+    fetchCities(selectedCountry, state);
   };
 
   const handleCityChange = (e) => {
     const city = e.target.value;
     setSelectedCity(city);
   };
-
+//disabled={!cities.length}
   return (
     <div>
       <select id="countryDropdown" onChange={handleCountryChange}>
@@ -107,7 +157,7 @@ const LocationSelector = () => {
         ))}
       </select>
 
-      <select id="cityDropdown" onChange={handleCityChange}>
+      <select id="cityDropdown" onChange={handleCityChange} >
         <option value="">Select City</option>
         {cities.map(city => (
           <option key={city} value={city}>{city}</option>
