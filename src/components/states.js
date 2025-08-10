@@ -8,7 +8,7 @@ const LocationSelector = () => {
   const [selectedState, setSelectedState] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
 
-   useEffect(() => {
+   /*useEffect(() => {
     const fetchCountries = async () => {
       try {
         const response = await fetch('https://crio-location-selector.onrender.com/countries');
@@ -30,7 +30,42 @@ const LocationSelector = () => {
     };
 
     fetchCountries();
-  }, []);
+  }, []);*/
+
+  useEffect(() => {
+  const fetchCountries = async () => {
+    try {
+      const response = await fetch('https://crio-location-selector.onrender.com/countries');
+
+      if (!response.ok) {
+        console.error("Country API failed:", response.status, response.statusText);
+        setCountries([]); // fallback empty list
+        return;
+      }
+
+      const text = await response.text();
+      let data = [];
+
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch (parseError) {
+          console.error("Invalid JSON from country API:", parseError);
+          data = [];
+        }
+      }
+
+      setCountries(data);
+
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+      setCountries([]); // fallback on error
+    }
+  };
+
+  fetchCountries();
+}, []);
+
 
   const fetchStates = async (country) => {
     try {
