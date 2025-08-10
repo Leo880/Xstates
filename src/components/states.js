@@ -8,32 +8,61 @@ const LocationSelector = () => {
   const [selectedState, setSelectedState] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
 
-  useEffect(() => {
-    // Fetch countries when component mounts
+   useEffect(() => {
     const fetchCountries = async () => {
-      // Implement your fetch logic for countries
-      
-      const response=await fetch('https://crio-location-selector.onrender.com/countries')
-      const data=await response.json();
-      setCountries(data);
+      try {
+        const response = await fetch('https://crio-location-selector.onrender.com/countries');
 
+        if (!response.ok) {
+          console.error("Country API failed:", response.status, response.statusText);
+          setCountries([]); // fallback empty list
+          return;
+        }
+
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : [];
+        setCountries(data);
+
+      } catch (error) {
+        console.error("Error fetching countries:", error);
+        setCountries([]); // fallback on error
+      }
     };
-    
+
     fetchCountries();
   }, []);
 
   const fetchStates = async (country) => {
-    // Fetch states based on selected country
-    const response = await fetch(`https://crio-location-selector.onrender.com/country=${country}/states`);
-    const data = await response.json();
-    setStates(data);
+    try {
+      const response = await fetch(`https://crio-location-selector.onrender.com/country=${country}/states`);
+      if (!response.ok) {
+        console.error("State API failed:", response.statusText);
+        setStates([]);
+        return;
+      }
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : [];
+      setStates(data);
+    } catch (error) {
+      console.error("Error fetching states:", error);
+      setStates([]);
+    }
   };
 
   const fetchCities = async (country, state) => {
-    if (state) {
+    try {
       const response = await fetch(`https://crio-location-selector.onrender.com/country=${country}/state=${state}/cities`);
-      const data = await response.json();
+      if (!response.ok) {
+        console.error("City API failed:", response.statusText);
+        setCities([]);
+        return;
+      }
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : [];
       setCities(data);
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+      setCities([]);
     }
   };
 
