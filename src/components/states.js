@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 
 const LocationSelector = () => {
@@ -10,7 +12,7 @@ const LocationSelector = () => {
 
   // Fetch countries once
   useEffect(() => {
-    const fetchCountries = async () => {
+    //const fetchCountries = async () => {
       /*try {
         const response = await fetch(
           'https://crio-location-selector.onrender.com/countries'
@@ -24,7 +26,7 @@ const LocationSelector = () => {
         setCountries([]);
       }*/
       
-      try {
+      /*try {
     const response = await fetch(
       'https://crio-location-selector.onrender.com/countries'
     );
@@ -49,7 +51,32 @@ const LocationSelector = () => {
       setCountries([]); // fallback empty list
     }
 
-    };
+    }; */
+
+    const fetchCountries = async () => {
+  try {
+    const response = await fetch(
+      "https://crio-location-selector.onrender.com/countries"
+    );
+
+    if (!response.ok) {
+      throw new Error("Country API failed");
+    }
+
+    let data = [];
+    try {
+      data = await response.json();   // ✅ this will throw if body is empty or invalid
+    } catch (parseErr) {
+      console.error("Invalid JSON from country API:", parseErr);
+      data = [];
+    }
+
+    setCountries(Array.isArray(data) ? data : []);
+  } catch (error) {
+    console.error("Error fetching countries:", error);
+    setCountries([]); // fallback empty list
+  }
+};
 
     fetchCountries();
   }, []);
@@ -167,3 +194,33 @@ const LocationSelector = () => {
 };
 
 export default LocationSelector;
+
+
+
+/*
+const fetchCountries = async () => {
+  try {
+    const response = await fetch(
+      "https://crio-location-selector.onrender.com/countries"
+    );
+
+    if (!response.ok) {
+      throw new Error("Country API failed");
+    }
+
+    let data = [];
+    try {
+      data = await response.json();   // ✅ this will throw if body is empty or invalid
+    } catch (parseErr) {
+      console.error("Invalid JSON from country API:", parseErr);
+      data = [];
+    }
+
+    setCountries(Array.isArray(data) ? data : []);
+  } catch (error) {
+    console.error("Error fetching countries:", error);
+    setCountries([]); // fallback empty list
+  }
+};
+
+*/
