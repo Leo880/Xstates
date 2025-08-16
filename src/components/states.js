@@ -16,7 +16,8 @@ const LocationSelector = () => {
           'https://crio-location-selector.onrender.com/countries'
         );
         if (!response.ok) throw new Error('Country API failed');
-        const data = await response.json();
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : [];
         setCountries(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching countries:', error);
@@ -34,7 +35,8 @@ const LocationSelector = () => {
         `https://crio-location-selector.onrender.com/country=${country}/states`
       );
       if (!response.ok) throw new Error('State API failed');
-      const data = await response.json();
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : [];
       setStates(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching states:', error);
@@ -49,7 +51,8 @@ const LocationSelector = () => {
         `https://crio-location-selector.onrender.com/country=${country}/state=${state}/cities`
       );
       if (!response.ok) throw new Error('City API failed');
-      const data = await response.json();
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : [];
       setCities(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching cities:', error);
